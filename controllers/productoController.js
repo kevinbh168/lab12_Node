@@ -1,5 +1,7 @@
 let db = require('../models/dbconexion');
 
+var fs = require('fs');
+
 let productos = {
   listar( req, res ){
     let sql = "SELECT * FROM productos";
@@ -13,18 +15,33 @@ let productos = {
     });
   },
   store( req, res ){
-    val_descripcion = req.body.descripcion;
-    val_precio = req.body.precio;
-    let sql = "INSERT INTO productos(descripcion,precio) VALUES(?,?)";
-    db.query(sql,[val_descripcion,val_precio],function(err, newData){
-      if(err){
+    console.log(req.files);
+    let tmp_path = req.files.uploads[0].path;
+    let target_path = './public/images/' + req.files.uploads[0].originalFilename;
+    let nombreImg = '/images/' + req.files.uploads[0].originalFilename;
+
+    console.log(target_path);
+
+
+    fs.rename(tmp_path,target_path,function(err){
+      if (err) throw err;
+      fs.unlink(tmp_path,function(){
+        if (err) throw err;
+
+        val_descripcion = req.body.descripcion;
+        val_precio = req.body.precio;
+        let sql = "INSERT INTO productos(descripcion,precio,imagen) VALUES(?,?,?)";
+        db.query(sql,[val_descripcion,val_precio,nombreImg],function(err, newData){
+        if(err){
         console.log(err);
         res.sendStatus(500);
-      }else{
+        }else{
         // res.json(newData);
         last_id = newData.insertId
         res.json({"last_id": last_id})
-      }
+        }
+        });
+      })
     });
   },
   show( req, res ){
