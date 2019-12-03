@@ -17,8 +17,9 @@ let productos = {
   store( req, res ){
     console.log(req.files);
     let tmp_path = req.files.uploads[0].path;
-    let target_path = './public/images/' + req.files.uploads[0].originalFilename;
-    let nombreImg = '/images/' + req.files.uploads[0].originalFilename;
+    let nombreImg = req.files.uploads[0].originalFilename;
+    let target_path = './public/images/' + nombreImg;
+    
 
     console.log(target_path);
 
